@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Portfolio</title>
+    <style>
+        body {
+            background-color: #0c0c0c;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            margin: 20px;
+            padding: 0;
+            line-height: 1.4;
+        }
+        #terminal {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #161616;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            min-height: 500px;
+        }
+        .output-line {
+            white-space: pre-wrap;
+            margin-bottom: 8px;
+        }
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+        .prompt {
+            color: #00ffff;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        #cmd-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            flex-grow: 1;
+        }
+        .highlight { color: #ffff00; }
+        .error { color: #ff0000; }
+        .info { color: #ffffff; }
+    </style>
+</head>
+<body>
+
+<div id="terminal">
+    <div id="output">
+        <div class="output-line info">Добро пожаловать в Terminal OS v1.0.0!</div>
+        <div class="output-line">Введите <span class="highlight">help</span> для просмотра списка доступных команд.</div>
+        <br>
+    </div>
+    <div class="input-line">
+        <span class="prompt">guest@portfolio:~$</span>
+        <input type="text" id="cmd-input" autofocus autocomplete="off" spellcheck="false">
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('cmd-input');
+    const output = document.getElementById('output');
+
+    // База данных проектов и информации
+    const infoData = {
+        skills: "🔥 Стек: Python (aiogram, FastAPI, Flask, Django), SQL (PostgreSQL, SQLite), Git, Docker, Linux.",
+        about: "👋 Привет! Я backend-разработчик. Создаю умных Telegram-ботов, проектирую базы данных и пишу чистый, оптимизированный код.",
+        contacts: "📧 Email: my-email@example.com\n✈️ Telegram: @my_telegram_username\n🐙 GitHub: github.com/my-profile"
+    };
+
+    const commands = {
+        'help': () => `Доступные команды:
+  <span class="highlight">about</span>      - Информация обо мне
+  <span class="highlight">skills</span>     - Мои навыки и стек технологий
+  <span class="highlight">projects</span>   - Список моих крутых проектов
+  <span class="highlight">contacts</span>   - Как со мной связаться
+  <span class="highlight">clear</span>      - Очистить экран терминала
+  <span class="highlight">matrix</span>     - Активировать режим Матрицы
+  <span class="highlight">sudo</span>       - Попробовать получить root-права`,
+        
+        'about': () => infoData.about,
+        'skills': () => infoData.skills,
+        'contacts': () => infoData.contacts,
+        
+        'projects': () => `📂 Мои проекты:
+1. <span class="highlight">PythonProject5 (Telegram Bot)</span> - Мощный бот на aiogram с интеграцией БД и аналитикой.
+2. <span class="highlight">Smart-Analytics DB</span> - Архитектура базы данных для коммерции (анализ валют, способов оплаты и брендов).
+3. <span class="highlight">AI Content-Agent</span> - Система автоматической генерации контента через API больших языковых моделей.`,
+        
+        'clear': () => {
+            output.innerHTML = '';
+            return '';
+        },
+        
+        'sudo': () => `<span class="error">Ошибка: Пользователь 'guest' не входит в группу sudoers. Инцидент будет записан. 😉</span>`,
+        
+        'matrix': () => {
+            setTimeout(() => { document.body.style.color = '#33ff33'; }, 500);
+            return "Wake up, Neo... The Matrix has you...";
+        }
+    };
+
+    // Фокус на инпут при клике в любое место терминала
+    document.getElementById('terminal').addEventListener('click', () => input.focus());
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const rawInput = this.value;
+            const cmd = rawInput.trim().toLowerCase();
+            
+            if (cmd === '') return;
+
+            // Выводим введённую команду
+            const promptLine = document.createElement('div');
+            promptLine.className = 'output-line';
+            promptLine.innerHTML = `<span class="prompt">guest@portfolio:~$</span> <span class="info">${rawInput}</span>`;
+            output.appendChild(promptLine);
+
+            // Обрабатываем команду
+            let response = '';
+            if (commands[cmd]) {
+                response = commands[cmd]();
+            } else {
+                response = `<span class="error">bash: command not found: ${rawInput}. Введите 'help' для подсказки.</span>`;
+            }
+
+            // Выводим результат (если команда не clear)
+            if (cmd !== 'clear' && response) {
+                const responseLine = document.createElement('div');
+                responseLine.className = 'output-line';
+                responseLine.innerHTML = response;
+                output.appendChild(responseLine);
+            }
+
+            // Очищаем инпут и скроллим вниз
+            this.value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    });
+</script>
+
+</body>
+</html>
