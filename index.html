@@ -1,150 +1,517 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Portfolio</title>
-    <style>
-        body {
-            background-color: #0c0c0c;
-            color: #00ff00;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            margin: 20px;
-            padding: 0;
-            line-height: 1.4;
-        }
-        #terminal {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: #161616;
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            min-height: 500px;
-        }
-        .output-line {
-            white-space: pre-wrap;
-            margin-bottom: 8px;
-        }
-        .input-line {
-            display: flex;
-            align-items: center;
-        }
-        .prompt {
-            color: #00ffff;
-            margin-right: 10px;
-            white-space: nowrap;
-        }
-        #cmd-input {
-            background: transparent;
-            border: none;
-            color: #00ff00;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-            flex-grow: 1;
-        }
-        .highlight { color: #ffff00; }
-        .error { color: #ff0000; }
-        .info { color: #ffffff; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mikhail Khorenko | Terminal Portfolio</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+body{
+    margin:0;
+    background:#0b0b0b;
+    color:#00ff88;
+    font-family:Consolas, monospace;
+    overflow-x:hidden;
+}
+
+#terminal{
+    max-width:1100px;
+    margin:30px auto;
+    background:#111;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:20px;
+    min-height:80vh;
+    box-shadow:0 0 30px rgba(0,255,100,0.15);
+}
+
+.output-line{
+    margin-bottom:10px;
+    white-space:pre-wrap;
+}
+
+.prompt{
+    color:#00d9ff;
+}
+
+.highlight{
+    color:#ffe600;
+}
+
+.error{
+    color:#ff4d4d;
+}
+
+.success{
+    color:#00ff88;
+}
+
+.input-line{
+    display:flex;
+    align-items:center;
+}
+
+#cmd-input{
+    background:transparent;
+    border:none;
+    outline:none;
+    color:#00ff88;
+    font-size:16px;
+    font-family:inherit;
+    flex:1;
+}
+
+#map{
+    height:300px;
+    width:100%;
+    margin-top:15px;
+    border-radius:10px;
+}
+
+a{
+    color:#00d9ff;
+}
+
+.boot{
+    color:#888;
+}
+
+@media(max-width:700px){
+    body{
+        font-size:14px;
+    }
+}
+</style>
 </head>
 <body>
 
 <div id="terminal">
-    <div id="output">
-        <div class="output-line info">Добро пожаловать в Terminal OS v1.0.0!</div>
-        <div class="output-line">Введите <span class="highlight">help</span> для просмотра списка доступных команд.</div>
-        <br>
-    </div>
-    <div class="input-line">
-        <span class="prompt">guest@portfolio:~$</span>
-        <input type="text" id="cmd-input" autofocus autocomplete="off" spellcheck="false">
-    </div>
+
+<div id="output"></div>
+
+<div class="input-line">
+<span class="prompt">mikhail@portfolio:~$</span>
+<input type="text" id="cmd-input" autofocus autocomplete="off">
 </div>
 
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script>
-    const input = document.getElementById('cmd-input');
-    const output = document.getElementById('output');
 
-    // База данных проектов и информации
-    const infoData = {
-        skills: "🔥 Стек: Python (aiogram, FastAPI, Flask, Django), SQL (PostgreSQL, SQLite), Git, Docker, Linux.",
-        about: "👋 Привет! Я backend-разработчик. Создаю умных Telegram-ботов, проектирую базы данных и пишу чистый, оптимизированный код.",
-        contacts: "📧 Email: my-email@example.com\n✈️ Telegram: @my_telegram_username\n🐙 GitHub: github.com/my-profile"
-    };
+const output = document.getElementById("output");
+const input = document.getElementById("cmd-input");
 
-    const commands = {
-        'help': () => `Доступные команды:
-  <span class="highlight">about</span>      - Информация обо мне
-  <span class="highlight">skills</span>     - Мои навыки и стек технологий
-  <span class="highlight">projects</span>   - Список моих крутых проектов
-  <span class="highlight">contacts</span>   - Как со мной связаться
-  <span class="highlight">clear</span>      - Очистить экран терминала
-  <span class="highlight">matrix</span>     - Активировать режим Матрицы
-  <span class="highlight">sudo</span>       - Попробовать получить root-права`,
-        
-        'about': () => infoData.about,
-        'skills': () => infoData.skills,
-        'contacts': () => infoData.contacts,
-        
-        'projects': () => `📂 Мои проекты:
-1. <span class="highlight">PythonProject5 (Telegram Bot)</span> - Мощный бот на aiogram с интеграцией БД и аналитикой.
-2. <span class="highlight">Smart-Analytics DB</span> - Архитектура базы данных для коммерции (анализ валют, способов оплаты и брендов).
-3. <span class="highlight">AI Content-Agent</span> - Система автоматической генерации контента через API больших языковых моделей.`,
-        
-        'clear': () => {
-            output.innerHTML = '';
-            return '';
-        },
-        
-        'sudo': () => `<span class="error">Ошибка: Пользователь 'guest' не входит в группу sudoers. Инцидент будет записан. 😉</span>`,
-        
-        'matrix': () => {
-            setTimeout(() => { document.body.style.color = '#33ff33'; }, 500);
-            return "Wake up, Neo... The Matrix has you...";
+let currentLang = "en";
+
+const translations = {
+
+en: {
+
+welcome: `
+<span class="boot">Booting MikhailOS v2.1...</span>
+<span class="boot">Loading portfolio modules...</span>
+<span class="success">SYSTEM READY</span>
+
+Welcome to the interactive terminal portfolio of <span class="highlight">Mikhail Khorenko</span>.
+
+Type <span class="highlight">help</span> to see available commands.
+`,
+
+help: `
+Available commands:
+
+<span class="highlight">about</span>        - Personal information
+<span class="highlight">family</span>       - Family information
+<span class="highlight">education</span>    - Education
+<span class="highlight">experience</span>   - Practical experience
+<span class="highlight">skills</span>       - Technical skills
+<span class="highlight">languages</span>    - Languages
+<span class="highlight">strengths</span>    - Personal strengths
+<span class="highlight">projects</span>     - Portfolio projects
+<span class="highlight">map</span>          - Show birthplace map
+<span class="highlight">lang en/de/ru</span> - Change language
+<span class="highlight">clear</span>        - Clear terminal
+`,
+
+about: `
+Name: Mikhail Khorenko
+Date of Birth: 01.02.2010
+Location: Bad Fallingbostel, Germany (29683)
+Born in: Bakhmut, Ukraine
+
+Interested in:
+- Programming
+- AI
+- Cybersecurity
+- Game Development
+- Arduino & Electronics
+`,
+
+family: `
+Father: Vitaliy Khorenko
+Profession: IT Engineer
+
+Mother: Kseniia Khorenko
+Profession: Ausbildung zur Sozialpädagogischen Assistentin
+
+Brother: Ivan (11 years old)
+`,
+
+education: `
+09.2016
+Gymnasium Nr. 194 "Perspective"
+Kyiv, Ukraine
+
+08.2022 - 12.2022
+Edith-Stein-Realschule
+49824 Emlichheim
+
+Since 01.2023
+OBS Lieth-Schule
+Bad Fallingbostel
+Gymnasialer Zweig
+`,
+
+experience: `
+2024 (10-21 March)
+Röders Tec, Soltau
+Position:
+- Fachinformatiker
+- Mechatroniker
+
+2025 (10-21 March)
+Hagebau IT, Soltau
+Position:
+- Fachinformatiker
+`,
+
+skills: `
+Programming:
+- Python
+- HTML
+- CSS
+- JavaScript
+
+Software:
+- GIMP
+- Blender
+- Word
+- Excel
+
+Hardware:
+- Arduino
+- PC Hardware
+`,
+
+languages: `
+Ukrainian  - Native
+Russian    - Fluent
+German     - B2
+English    - Good
+`,
+
+strengths: `
+- Reliable
+- Responsible
+- Creative
+- Independent
+- Motivated to learn
+- Fast learner
+`,
+
+projects: `
+Projects:
+
+1. Discord Bots
+2. Telegram Shop Bots
+3. AI Projects
+4. Arduino Systems
+5. Trading Analytics
+6. Game Development
+7. 3D Printing
+`,
+
+mapText: `Opening interactive map of Bakhmut...`
+
+},
+
+de: {
+
+welcome: `
+Willkommen im interaktiven Terminal-Portfolio von
+<span class="highlight">Mikhail Khorenko</span>.
+
+Tippe <span class="highlight">help</span>.
+`,
+
+help: `
+Verfügbare Befehle:
+
+about
+family
+education
+experience
+skills
+languages
+strengths
+projects
+map
+lang en/de/ru
+clear
+`,
+
+about: `
+Name: Mikhail Khorenko
+Geburtsdatum: 01.02.2010
+Wohnort: Bad Fallingbostel
+
+Geboren in:
+Bakhmut, Ukraine
+`,
+
+family: `
+Vater:
+Vitaliy Khorenko
+IT Ingenieur
+
+Mutter:
+Kseniia Khorenko
+Ausbildung zur Sozialpädagogischen Assistentin
+
+Bruder:
+Ivan
+`,
+
+education: `
+Gymnasium Nr. 194 "Perspective"
+Edith-Stein-Realschule
+OBS Lieth-Schule
+`,
+
+experience: `
+Röders Tec, Soltau
+Hagebau IT, Soltau
+`,
+
+skills: `
+Python
+HTML
+CSS
+JavaScript
+Blender
+Arduino
+GIMP
+`,
+
+languages: `
+Ukrainisch
+Russisch
+Deutsch B2
+Englisch
+`,
+
+strengths: `
+Zuverlässig
+Verantwortungsvoll
+Kreativ
+Selbstständig
+Lernbereit
+`,
+
+projects: `
+Bots
+AI Projekte
+Arduino Systeme
+Trading Analytics
+`,
+
+mapText: `Interaktive Karte wird geöffnet...`
+
+},
+
+ru: {
+
+welcome: `
+Добро пожаловать в терминальное портфолио
+<span class="highlight">Михаила Хоренко</span>.
+
+Введите <span class="highlight">help</span>.
+`,
+
+help: `
+Команды:
+
+about
+family
+education
+experience
+skills
+languages
+strengths
+projects
+map
+lang en/de/ru
+clear
+`,
+
+about: `
+Михаил Хоренко
+01.02.2010
+
+Проживает:
+Bad Fallingbostel
+
+Родился:
+Бахмут, Украина
+`,
+
+family: `
+Отец:
+Виталий Хоренко
+IT инженер
+
+Мать:
+Ксения Хоренко
+
+Брат:
+Иван
+`,
+
+education: `
+Gymnasium Nr.194
+Edith-Stein-Realschule
+OBS Lieth-Schule
+`,
+
+experience: `
+Röders Tec
+Hagebau IT
+`,
+
+skills: `
+Python
+HTML
+CSS
+JavaScript
+Arduino
+Blender
+`,
+
+languages: `
+Украинский
+Русский
+Немецкий B2
+Английский
+`,
+
+strengths: `
+Ответственный
+Креативный
+Самостоятельный
+`,
+
+projects: `
+Боты
+AI проекты
+Arduino
+3D печать
+`,
+
+mapText: `Открывается карта Бахмута...`
+
+}
+
+};
+
+function printLine(text){
+    const div = document.createElement("div");
+    div.className = "output-line";
+    div.innerHTML = text;
+    output.appendChild(div);
+
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+function showWelcome(){
+    printLine(translations[currentLang].welcome);
+}
+
+showWelcome();
+
+function showMap(){
+
+    printLine(translations[currentLang].mapText);
+
+    const mapDiv = document.createElement("div");
+    mapDiv.id = "map";
+
+    output.appendChild(mapDiv);
+
+    const map = L.map(mapDiv).setView([48.5956, 37.9999], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:'© OpenStreetMap'
+    }).addTo(map);
+
+    L.marker([48.5956, 37.9999])
+        .addTo(map)
+        .bindPopup("Bakhmut, Ukraine")
+        .openPopup();
+}
+
+input.addEventListener("keydown", function(e){
+
+    if(e.key === "Enter"){
+
+        const raw = input.value.trim();
+
+        if(!raw) return;
+
+        printLine(`<span class="prompt">mikhail@portfolio:~$</span> ${raw}`);
+
+        const cmd = raw.toLowerCase();
+
+        if(cmd === "help"){
+            printLine(translations[currentLang].help);
         }
-    };
 
-    // Фокус на инпут при клике в любое место терминала
-    document.getElementById('terminal').addEventListener('click', () => input.focus());
+        else if(translations[currentLang][cmd]){
+            printLine(translations[currentLang][cmd]);
+        }
 
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const rawInput = this.value;
-            const cmd = rawInput.trim().toLowerCase();
-            
-            if (cmd === '') return;
+        else if(cmd.startsWith("lang ")){
 
-            // Выводим введённую команду
-            const promptLine = document.createElement('div');
-            promptLine.className = 'output-line';
-            promptLine.innerHTML = `<span class="prompt">guest@portfolio:~$</span> <span class="info">${rawInput}</span>`;
-            output.appendChild(promptLine);
+            const lang = cmd.split(" ")[1];
 
-            // Обрабатываем команду
-            let response = '';
-            if (commands[cmd]) {
-                response = commands[cmd]();
+            if(["en","de","ru"].includes(lang)){
+                currentLang = lang;
+                printLine(`<span class="success">Language switched to ${lang}</span>`);
             } else {
-                response = `<span class="error">bash: command not found: ${rawInput}. Введите 'help' для подсказки.</span>`;
+                printLine(`<span class="error">Unknown language</span>`);
             }
-
-            // Выводим результат (если команда не clear)
-            if (cmd !== 'clear' && response) {
-                const responseLine = document.createElement('div');
-                responseLine.className = 'output-line';
-                responseLine.innerHTML = response;
-                output.appendChild(responseLine);
-            }
-
-            // Очищаем инпут и скроллим вниз
-            this.value = '';
-            window.scrollTo(0, document.body.scrollHeight);
         }
-    });
+
+        else if(cmd === "clear"){
+            output.innerHTML = "";
+        }
+
+        else if(cmd === "map"){
+            showMap();
+        }
+
+        else{
+            printLine(`<span class="error">Command not found: ${raw}</span>`);
+        }
+
+        input.value = "";
+    }
+
+});
+
 </script>
 
 </body>
