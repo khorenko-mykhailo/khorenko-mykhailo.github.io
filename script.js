@@ -5,44 +5,45 @@ const terminal = document.getElementById("terminal");
 let shouldAutoScroll = true;
 let autoScrollFrame = null;
 
+let firstBoot = true;
+let scrollReady = false;
+let firstUserCommand = true;
+
 function isNearBottom() {
+
     return (
-        terminal.scrollTop + terminal.clientHeight >=
-        terminal.scrollHeight - 100
+        window.innerHeight + window.scrollY
+        >=
+        document.body.scrollHeight - 120
     );
+
 }
 
-// пользователь скроллит
-terminal.addEventListener("scroll", () => {
+window.addEventListener("scroll", () => {
+
     shouldAutoScroll = isNearBottom();
-}, { passive: true });
 
-function autoScrollToBottom(force = false) {
+}, { passive:true });
 
-    if (!shouldAutoScroll && !force) return;
+function autoScrollToBottom(force = false){
 
-    // отменяем предыдущий кадр
-    if (autoScrollFrame) {
+    if(firstBoot && !force) return;
+
+    if(!scrollReady && !force) return;
+
+    if(!shouldAutoScroll && !force) return;
+
+    if(autoScrollFrame){
         cancelAnimationFrame(autoScrollFrame);
     }
 
     autoScrollFrame = requestAnimationFrame(() => {
 
-        terminal.scrollTop = terminal.scrollHeight;
+        window.scrollTo({
+        top: document.body.scrollHeight,
+        left: 0
+        });
 
-    });
-
-}
-
-
-// плавный автоскролл как в ChatGPT
-function autoScrollToBottom(){
-
-    if(!shouldAutoScroll) return;
-
-    terminal.scrollTo({
-        top: terminal.scrollHeight,
-        behavior: "smooth"
     });
 
 }
@@ -80,69 +81,69 @@ Available commands:
 `,
 
 profile: `
-Name:
+<span class="highlight">Name:</span>
 Mykhailo Khorenko
 
-Date of Birth:
+<span class="highlight">Date of Birth:</span>
 01.02.2010
 
-Residence:
+<span class="highlight">Residence:</span>
 Bad Fallingbostel, Germany (29683)
 
-Place of Birth:
+<span class="highlight">Place of Birth:</span>
 Bakhmut, Ukraine
 
-Family:
+<span class="highlight">Family:</span>
 Father - Vitaliy Khorenko (IT Engineer)
 Mother - Kseniia Khorenko (Childhood Education Assistant)
 Brother - Ivan (11 years old)
 
-Interests:
+<span class="highlight">Interests:</span>
 Programming, AI, Game Development, Arduino,
 3D Design, Tabletennis, Athletics, Karate
 `,
 
 education: `
-09.2016
+<span class="highlight">09.2016</span>
 Gymnasium Nr. 194 "Perspective"
 Kyiv, Ukraine
 
-08.2022 - 12.2022
+<span class="highlight">08.2022 - 12.2022</span>
 Edith-Stein-Realschule
 Emlichheim, Germany
 
-Since 01.2023
+<span class="highlight">Since 01.2023</span>
 OBS Lieth-Schule (Gymnasium branch)
 Bad Fallingbostel
 `,
 
 experience: `
-2024 (10-21 March)
+<span class="highlight">2024 (10-21 March)</span>
 Röders Tec, Soltau
 Software- & Mechatronics- Engineer
 
-2025 (10-21 March)
+<span class="highlight">2025 (10-21 March)</span>
 Hagebau IT, Soltau
 Software Engineer
 `,
 
 skills: `
-Programming:
+<span class="highlight">Programming:</span>
 Python, HTML, CSS, JavaScript, SQL
 
-Software:
+<span class="highlight">Software:</span>
 GIMP, Blender, Word, Excel
 
-Hardware:
+<span class="highlight">Hardware:</span>
 Arduino, PC Hardware
 
-Languages:
+<span class="highlight">Languages:</span>
 Ukrainian (Native)
 Russian (Fluent)
 German (B2)
 English (Good)
 
-Strengths:
+<span class="highlight">Strengths:</span>
 Reliable, Responsible,
 Creative, Independent,
 Fast learner, Patient,
@@ -150,7 +151,7 @@ Organized, Team-oriented
 `,
 
 projects: `
-Projects:
+<span class="highlight">Projects:</span>
 
 - Telegram Bots
 - AI Projects
@@ -160,13 +161,16 @@ Projects:
 `,
 
 contacts: `
-Telegram:
+<span class="highlight">WhatsApp:</span>
++380662574515
+
+<span class="highlight">Telegram:</span>
 @funny_person
 
-GitHub:
-github.com/horenkomihailo
+<span class="highlight">GitHub:</span>
+github.com/khorenko-mykhailo
 
-Email:
+<span class="highlight">Email:</span>
 horenkomihailo2022@gmail.com
 `
 
@@ -198,65 +202,65 @@ Verfügbare Befehle:
 `,
 
 profile: `
-Name:
+<span class="highlight">Name:</span>
 Mykhailo Khorenko
 
-Geburtsdatum:
+<span class="highlight">Geburtsdatum:</span>
 01.02.2010
 
-Wohnort:
+<span class="highlight">Wohnort:</span>
 Bad Fallingbostel, Deutschland (29683)
 
-Geburtsort:
+<span class="highlight">Geburtsort:</span>
 Bakhmut, Ukraine
 
-Familie:
+<span class="highlight">Familie:</span>
 Vater - IT Ingenieur
 Mutter - Sozialpädagogische Assistentin
 Bruder - Ivan (11 Jahre alt)
 `,
 
 education: `
-09.2016
+<span class="highlight">09.2016</span>
 Gymnasium Nr. 194 "Perspective"
 Kyiv, Ukraine
 
-08.2022 - 12.2022
+<span class="highlight">08.2022 - 12.2022</span>
 Edith-Stein-Realschule
 Emlichheim, Deutschland
 
-Since 01.2023
+<span class="highlight">Since 01.2023</span>
 OBS Lieth-Schule (Gymnasialer Zweig)
 Bad Fallingbostel
 `,
 
 experience: `
-2024 (10-21 März)
+<span class="highlight">2024 (10-21 März)</span>
 Röders Tec, Soltau
 Fachinformatiker & Mechatroniker
 
-2025 (10-21 März)
+<span class="highlight">2025 (10-21 März)</span>
 Hagebau IT, Soltau
 Fachinformatiker
 `,
 
 skills: `
-Programmierung:
+<span class="highlight">Programmierung:</span>
 Python, HTML, CSS, JavaScript, SQL
 
-Software:
+<span class="highlight">Software:</span>
 GIMP, Blender, Word, Excel
 
-Hardware:
+<span class="highlight">Hardware:</span>
 Arduino, Computer Hardware
 
-Sprachen:
+<span class="highlight">Sprachen:</span>
 Ukrainisch
 Russisch
 Deutsch B2
 Englisch
 
-Stärken:
+<span class="highlight">Stärken:</span>
 Zuverlässig
 Verantwortungsvoll
 Kreativ
@@ -265,19 +269,27 @@ Lernbereit
 `,
 
 projects: `
-Bots
-AI Projekte
-Arduino Systeme
-Trading Analytics
-3D Druck
+<span class="highlight">Projekte:</span>
+
+- Telegram-Bots
+- KI-Projekte
+- Arduino-Systeme
+- Webentwicklung
+- 3D-Modellierung
 `,
 
 contacts: `
-Telegram
-GitHub
-Gmail
-WhatsApp
-LinkedIn
+<span class="highlight">WhatsApp:</span>
++380662574515
+
+<span class="highlight">Telegram:</span>
+@funny_person
+
+<span class="highlight">GitHub:</span>
+github.com/khorenko-mykhailo
+
+<span class="highlight">Email:</span>
+horenkomihailo2022@gmail.com
 `
 
 },
@@ -288,95 +300,119 @@ welcome: `
 Добро пожаловать в интерактивное
 терминальное портфолио
 
-<span class="highlight">Михаила Хоренко</span>
+<span class="highlight">Михаила Хоренка</span>
+
+Ученик | Разработчик | Создатель
 
 Введите <span class="highlight">help</span>.
 `,
 
 help: `
-Команды:
+Доступные команды:
 
-profile
-education
-experience
-skills
-projects
-contacts
-map
-download
-lang en/de/ru
-clear
+<span class="highlight">profile</span>     - О себе 
+<span class="highlight">education</span>   - Образование
+<span class="highlight">experience</span>  - Практический опыт
+<span class="highlight">skills</span>      - Навыки и языки
+<span class="highlight">projects</span>    - Проекты
+<span class="highlight">contacts</span>    - Контакты
+<span class="highlight">download</span>    - Скачать резюме
+<span class="highlight">lang en/de/ru</span> - Сменить язык
+<span class="highlight">clear</span>       - Очистить терминал
 `,
 
 profile: `
-Имя:
-Михаил Хоренко
+<span class="highlight">Имя:</span>
+Хоренко Михаил
 
-Дата рождения:
+<span class="highlight">Дата рождения:</span>
 01.02.2010
 
-Проживание:
-Bad Fallingbostel, Germany
+<span class="highlight">Место жительства:</span>
+Бад-Фаллинбостель, Германия (29683)
 
-Место рождения:
+<span class="highlight">Место рождения:</span>
 Бахмут, Украина
 
-Семья:
-Отец - IT инженер
-Мать - Sozialpädagogische Assistentin
-Брат - Иван
+<span class="highlight">Семья:</span>
+Отец - Виталий Хоренко (ИТ инженер)
+Мать - Ксения Хоренко (Ассистент по детскому образованию)
+Брат - Иван (11 лет)
+
+<span class="highlight">Интересы:</span>
+Программирование, ИИ, Разработка игр, Arduino,
+3D дизайн, Настольный теннис, Лёгкая атлетика, Карате
 `,
 
 education: `
-Gymnasium Nr. 194 "Perspective"
+<span class="highlight">09.2016</span>
+Гимназия №194 "Перспектива"
+Киев, Украина
 
+<span class="highlight">08.2022 - 12.2022</span>
 Edith-Stein-Realschule
+Emlichheim, Германия
 
-OBS Lieth-Schule
+<span class="highlight">С 01.2023</span>
+OBS Lieth-Schule (Гимнастический отдел)
+Bad Fallingbostel
 `,
 
 experience: `
-Röders Tec
-Fachinformatiker & Mechatroniker
+<span class="highlight">2024 (10-21 März)</span>
+Röders Tec, Soltau
+Специалист по информационным технологиям и мехатронике
 
-Hagebau IT
-Fachinformatiker
+<span class="highlight">2025 (10-21 März)</span>
+Hagebau IT, Soltau
+Специалист по информационным технологиям
 `,
 
 skills: `
-Python
-HTML
-CSS
-JavaScript
-GIMP
-Blender
-Arduino
+<span class="highlight">Программирование:</span>
+Python, HTML, CSS, JavaScript, SQL
 
-Языки:
-Украинский
-Русский
-Немецкий B2
-Английский
+<span class="highlight">Программное обеспечение:</span>
+GIMP, Blender, Word, Excel
 
-Сильные стороны:
-Ответственный
-Креативный
-Самостоятельный
+<span class="highlight">Аппаратное обеспечение:</span>
+Arduino, Компьютерное оборудование
+
+<span class="highlight">Языки:</span>
+Украинский (родной)
+Русский (свободно)
+Немецкий (B2)
+Английский (хорошо)
+
+<span class="highlight">Сильные стороны:</span>
+Надёжный, Ответственный,
+Креативный, Независимый,
+Быстро обучаемый, Терпеливый,
+Организованный, Командный игрок
 `,
 
 projects: `
-Discord Bots
-Telegram Bots
-AI Projects
-Arduino
-3D Printing
+<span class="highlight">Проекты:</span>
+
+- Telegram-боты
+- Проекты ИИ
+- Системы Arduino
+- Веб-разработка
+- 3D-моделирование
 `,
 
 contacts: `
-Telegram
-GitHub
-Gmail
-WhatsApp
+<span class="highlight">WhatsApp:</span>
++380662574515
+
+<span class="highlight">Telegram:</span>
+@funny_person
+
+<span class="highlight">GitHub:</span>
+github.com/khorenko-mykhailo
+
+<span class="highlight">Email:</span>
+horenkomihailo2022@gmail.com
 `
 
 }
@@ -389,7 +425,10 @@ async function print(text, speed = 12){
     div.className = "output-line";
 
     output.appendChild(div);
-    autoScrollToBottom();
+
+    requestAnimationFrame(() => {
+        autoScrollToBottom();
+    });
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, "text/html");
@@ -409,7 +448,7 @@ async function print(text, speed = 12){
                 textNode.textContent += char;
             
                 counter++;
-            
+                
                 if(counter % 15 === 0){
                     autoScrollToBottom();
                 }
@@ -452,15 +491,26 @@ async function print(text, speed = 12){
 
 
 
-function boot(){
+async function boot(){
 
-    print(`
+    await print(`
 <span class="success">
 SYSTEM ONLINE
 </span>
 `);
 
-    print(data[currentLang].welcome);
+    await print(data[currentLang].welcome);
+
+    firstBoot = false;
+
+    setTimeout(() => {
+
+        scrollReady = true;
+
+        // обновляем состояние автоскролла
+        shouldAutoScroll = isNearBottom();
+
+    }, 300);
 
 }
 
@@ -502,38 +552,17 @@ map(){
 
 download(){
 
-    const { jsPDF } = window.jspdf;
+    const link = document.createElement("a");
 
-    const doc = new jsPDF();
+    link.href = "./Mykhailo_Khorenko_CV.pdf";
 
-    doc.setFont("courier");
+    link.download = "Mykhailo_Khorenko_CV.pdf";
 
-    doc.setFontSize(16);
-    doc.text("Mykhailo Khorenko", 20, 20);
+    document.body.appendChild(link);
 
-    doc.setFontSize(12);
+    link.click();
 
-    doc.text(`
-Student | Developer | Creator
-
-Skills:
-- Python
-- JavaScript
-- HTML/CSS
-- Arduino
-- AI Projects
-
-Languages:
-- Ukrainian
-- German
-- English
-
-Contacts:
-GitHub: github.com/horenkomihailo
-Email: horenkomihailo2022@gmail.com
-`, 20, 40);
-
-    doc.save("Mykhailo_Khorenko_CV.pdf");
+    document.body.removeChild(link);
 
     print(`
 <span class="success">
@@ -571,6 +600,19 @@ input.addEventListener("keydown", function(e){
         `<span class="prompt">mikhail@portfolio:~$</span> ${raw}`;
 
         output.appendChild(cmdLine);
+
+        // первую команду не скроллим
+        if(firstUserCommand){
+        
+            firstUserCommand = false;
+        
+        } else {
+        
+            requestAnimationFrame(() => {
+                autoScrollToBottom();
+            });
+        
+        }
 
         const cmd = raw.toLowerCase();
 
@@ -671,20 +713,6 @@ const redIcon = new L.Icon({
     iconAnchor:[12,41]
 });
 
-const greenIcon = new L.Icon({
-    iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-    shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize:[25,41],
-    iconAnchor:[12,41]
-});
-
-const violetIcon = new L.Icon({
-    iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-    shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize:[25,41],
-    iconAnchor:[12,41]
-});
-
 L.marker([48.5956,37.9999],{
     icon:blueIcon
 })
@@ -696,15 +724,3 @@ L.marker([52.866,9.695],{
 })
 .addTo(map)
 .bindPopup("Living in Bad Fallingbostel");
-
-L.marker([52.986,9.843],{
-    icon:greenIcon
-})
-.addTo(map)
-.bindPopup("Röders Tec Practice");
-
-L.marker([52.986,9.843],{
-    icon:violetIcon
-})
-.addTo(map)
-.bindPopup("Hagebau IT Practice");
